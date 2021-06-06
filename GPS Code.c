@@ -1,3 +1,35 @@
+#include"stdint.h"
+#include"stdlib.h"
+#include"stdio.h"
+#include"math.h"
+#include"string.h"
+#include"C:\Keil\tm4c123gh6pm.h"
+void SystemInit(){}
+
+#define RS 0x20
+#define RW 0x40
+#define EN 0x80
+#define pi 3.14159265358979323846
+
+double deg2rad(double deg) {
+return (deg * pi / 180);
+}
+
+double rad2deg(double rad) {
+return (rad * 180 / pi);
+}
+double DST(double lat1, double lon1, double lat2, double lon2) {
+double theta, dist;
+if ((lat1 == lat2) && (lon1 == lon2)) {
+return 0;
+}
+else {
+theta = lon1 - lon2;
+dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
+dist = acos(dist);
+dist = rad2deg(dist);
+dist = dist * 60 * 2560.8651;
+return (dist);
 void delay(int x) {​​
 int i,j;
 for(i=0;i<x;i++)
