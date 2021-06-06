@@ -30,28 +30,29 @@ dist = acos(dist);
 dist = rad2deg(dist);
 dist = dist * 60 * 2560.8651;
 return (dist);
-void delay(int x) {​​
+void delay(int x) {
 int i,j;
 for(i=0;i<x;i++)
-{​​
-for(j=0;j<3180;j++){​​}​​
-}​​
-}​​
+{
+for(j=0;j<3180;j++){}
+}
+}
 void delayus(int y)
-{​​
+{
 int i, j;
 for(i = 0 ;i < y; i++)
 for(j = 0; j < 3; j++)
-{​​}​​
-}​​
-void LCD_CMD(unsigned char cmd){​​
+{}
+}
+void LCD_CMD(unsigned char cmd){
 GPIO_PORTA_DATA_R = 0 ;
 GPIO_PORTB_DATA_R = cmd ;
 GPIO_PORTA_DATA_R |= EN ;
 delay(2);
 GPIO_PORTA_DATA_R &= ~EN ;
-if(cmd<4) delay(2); else delayus(40);}​​
-void GPS_Init(){​​
+if(cmd<4) delay(2); else delayus(40);}
+void GPS_Init(){
+SYSCTL_RCGCUART_R |= 0x04;
 SYSCTL_RCGCGPIO_R |= 0x04;
 while ((SYSCTL_PRGPIO_R & 0x04) == 0);
 GPIO_PORTC_LOCK_R = 0x4C4F434B;
@@ -61,7 +62,12 @@ GPIO_PORTC_DEN_R |= 0x40;
 GPIO_PORTC_AFSEL_R |= 0x40;
 GPIO_PORTC_AMSEL_R |= 0x00;
 GPIO_PORTC_PCTL_R |= 0x0F000000;
-}​​
+UART3_CTL_R = 0x0000;
+UART3_IBRD_R = 104;
+UART3_FBRD_R = 11;
+UART3_LCRH_R = 0x60;
+UART3_CTL_R = 0x0301;
+}
 
 void RGBLED_Init ()
 {
