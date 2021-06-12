@@ -51,17 +51,18 @@ GPIO_PORTA_DATA_R |= EN ;
 delay(2);
 GPIO_PORTA_DATA_R &= ~EN ;
 if(cmd<4) delay(2); else delayus(40);}
+	
+	
 void GPS_Init(){
-SYSCTL_RCGCUART_R |= 0x04;
-SYSCTL_RCGCGPIO_R |= 0x04;
-while ((SYSCTL_PRGPIO_R & 0x04) == 0);
+SYSCTL_RCGCUART_R |=SYSCTL_RCGCUART_R3 ;
+SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R2 ;
+while ((SYSCTL_PRGPIO_R & 0x04) == 0);	
 GPIO_PORTC_LOCK_R = 0x4C4F434B;
 GPIO_PORTC_CR_R |= 0x40 ;
-GPIO_PORTC_DIR_R &= 0xBF;
 GPIO_PORTC_DEN_R |= 0x40;
-GPIO_PORTC_AFSEL_R |= 0x40;
+GPIO_PORTC_AFSEL_R |= 0x40;    
 GPIO_PORTC_AMSEL_R |= 0x00;
-GPIO_PORTC_PCTL_R |= 0x0F000000;
+GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R&=~0x0F000000)|0x0F000000; 
 UART3_CTL_R = 0x0000;
 UART3_IBRD_R = 104;
 UART3_FBRD_R = 11;
@@ -69,6 +70,7 @@ UART3_LCRH_R = 0x60;
 UART3_CTL_R = 0x0301;
 }
 
+	
 void RGBLED_Init ()
 {
 SYSCTL_RCGCGPIO_R |= 0x20;
@@ -122,6 +124,7 @@ char text3[3];
 char text2[2];
 char text1[1];
 int distance = 185 ;
+GPS_Init()
 RGBLED_Init ();
 if (distance >=100){
 GPIO_PORTF_DATA_R |= 0x02;
@@ -146,21 +149,21 @@ if(distance<10){
 for(i=0;i<1;i++){
 char c=text1[i];
 LCD_WR(c);}
-delay(3000);
+delay(1000);
 }
 
 if(distance<100&&distance>=10){
 for(i=0;i<2;i++){
 char c=text2[i];
 LCD_WR(c);}
-delay(3000);
+delay(1000);
 }
 
 if(distance>=100){
 for(i=0;i<3;i++){
 char c=text3[i];
 LCD_WR(c);}
-delay(3000);
+delay(1000);
 }
 }
 	}
