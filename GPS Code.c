@@ -44,6 +44,18 @@ for(i = 0 ;i < y; i++)
 for(j = 0; j < 3; j++)
 {}
 }
+	
+int UART3_Check(){
+  return ((UART3_FR_R & UART_FR_RXFE ) == UART_FR_RXFE)? 0:1;
+}
+ 
+
+unsigned char UART3_read(void){
+   while(UART3_Check()!=1){};
+    return (unsigned char)(UART3_DR_R & 0xFF);	 
+}	
+	
+	
 void LCD_CMD(unsigned char cmd){
 GPIO_PORTA_DATA_R = 0 ;
 GPIO_PORTB_DATA_R = cmd ;
@@ -63,11 +75,11 @@ GPIO_PORTC_DEN_R |= 0x40;
 GPIO_PORTC_AFSEL_R |= 0x40;    
 GPIO_PORTC_AMSEL_R |= 0x00;
 GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R&=~0x0F000000)|0x0F000000; 
-UART3_CTL_R = 0x0000;
+UART3_CTL_R &= ~UART_CTL_UARTEN;
 UART3_IBRD_R = 104;
 UART3_FBRD_R = 11;
-UART3_LCRH_R = 0x60;
-UART3_CTL_R = 0x0301;
+UART3_LCRH_R = (UART_LCRH_WLEN_8| UART_LCRH_FEN );
+UART3_CTL_R = (UART_CTL_UARTEN | UART_CTL_RXE | UART_CTL_TXE);
 }
 
 	
@@ -118,21 +130,59 @@ GPIO_PORTA_DATA_R &= ~EN  ;
 
 
 int main (){
-while(1){
 int i;
 char text3[3];
 char text2[2];
 char text1[1];
-int distance = 185 ;
+int distance  ;
+LCD_Init();{
+delay(20);
+LCD_CMD(0x01);
+delay(4);}
+UART3_Check();
 GPS_Init()
 RGBLED_Init ();
+while(1){
+
 if (distance >=100){
 GPIO_PORTF_DATA_R |= 0x02;
 }
 sprintf(text1,"%d",distance);
 sprintf(text2,"%d",distance);
 sprintf(text3,"%d",distance);
-LCD_Init();{
+if(UART3_read()=='$'){
+	if(UART3_read()=='G'){
+		if(UART3_read()=='P'){
+			if(UART3_read()=='R'){
+				if(UART3_read()=='M'){
+					if(UART3_read()=='C'){
+						for(g=0;g<48;g++){
+							DATA[g]=UART3_read();}
+						for(g=0;g<48;g++){
+							LCD_WR(DATA[g]);
+							delay(100);
+							if(g==16){LCD_CMD(0x01);}
+							if(g==32){LCD_CMD(0x01);}
+						if(g==48){LCD_CMD(0x01);}
+						}
+		for(g=0;g<48;g++){						
+		if(DATA[g]==','){
+			CNT++;}
+		if(DATA[g]==',' && CNT==3){	
+		for(j=0;j<=6;j++){
+			g=g+1;
+    LNG[j]=DATA[g];
+		}
+		
+
+		}
+		if(c==',' && CNT==5){
+		for(k=0;k<=6;k++){
+			g=g+1;
+		LAT[k]=DATA[g];
+		}
+		CNT=0;}
+
 delay(20);
 LCD_CMD(0x01);
 delay(4);
@@ -165,6 +215,6 @@ char c=text3[i];
 LCD_WR(c);}
 delay(1000);
 }
-}
+
 	}
 }
