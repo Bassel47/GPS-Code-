@@ -18,18 +18,30 @@ return (deg * pi / 180);
 double rad2deg(double rad) {
 return (rad * 180 / pi);
 }
-double DST(double lat1, double lon1, double lat2, double lon2) {
+double DST(double lat2, double lon2) {
+    double lat1; double lon1;
 double theta, dist;
 if ((lat1 == lat2) && (lon1 == lon2)) {
 return 0;
 }
 else {
+    int n=1;
+    if(n==1){
+        lat1=lat2;
+        lon1=lon2;
+        n=n+1;
+    }
+       
 theta = lon1 - lon2;
 dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
 dist = acos(dist);
 dist = rad2deg(dist);
 dist = dist * 60 * 2560.8651;
+    lat1=lat2;
+    lon1=lon2;
 return (dist);
+}
+}
 void delay(int x) {
 int i,j;
 for(i=0;i<x;i++)
@@ -67,14 +79,15 @@ if(cmd<4) delay(2); else delayus(40);}
 	
 void GPS_Init(){
 SYSCTL_RCGCUART_R |=SYSCTL_RCGCUART_R3 ;
-SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R2 ;
-while ((SYSCTL_PRGPIO_R & 0x04) == 0);	
+    while((SYSCTL_PRUART_R & SYSCTL_RCGCUART_R3) == 0);
+SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R2 ;   
+    while((SYSCTL_PRGPIO_R & 0x04) == 0){};
 GPIO_PORTC_LOCK_R = 0x4C4F434B;
 GPIO_PORTC_CR_R |= 0x40 ;
 GPIO_PORTC_DEN_R |= 0x40;
-GPIO_PORTC_AFSEL_R |= 0x40;    
-GPIO_PORTC_AMSEL_R |= 0x00;
-GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R&=~0x0F000000)|0x0F000000; 
+GPIO_PORTC_AFSEL_R |= 0x40;   
+GPIO_PORTC_AMSEL_R &= ~0x40;
+GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R & ~0xFF000000) | (GPIO_PCTL_PC6_U3RX | GPIO_PCTL_PC7_U3TX );
 UART3_CTL_R &= ~UART_CTL_UARTEN;
 UART3_IBRD_R = 104;
 UART3_FBRD_R = 11;
@@ -182,7 +195,9 @@ if(UART3_read()=='$'){
 		LAT[k]=DATA[g];
 		}
 		CNT=0;}
-
+LONGIT=strtod(LNG,&ptr);
+LATIT=strtod(LAT,&pts);
+DST( LATIT , LONGIT);
 delay(20);
 LCD_CMD(0x01);
 delay(4);
