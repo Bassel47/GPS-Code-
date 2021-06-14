@@ -160,9 +160,7 @@ while(1){
 if (distance >=100){
 GPIO_PORTF_DATA_R |= 0x02;
 }
-sprintf(text1,"%d",distance);
-sprintf(text2,"%d",distance);
-sprintf(text3,"%d",distance);
+
 if(UART3_read()=='$'){
 	if(UART3_read()=='G'){
 		if(UART3_read()=='P'){
@@ -197,7 +195,10 @@ if(UART3_read()=='$'){
 		CNT=0;}
 LONGIT=strtod(LNG,&ptr);
 LATIT=strtod(LAT,&pts);
-DST( LATIT , LONGIT);
+distance=DST( LATIT , LONGIT);
+sprintf(text1,"%d",distance);
+sprintf(text2,"%d",distance);
+sprintf(text3,"%d",distance);
 delay(20);
 LCD_CMD(0x01);
 delay(4);
