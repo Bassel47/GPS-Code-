@@ -151,7 +151,7 @@ int distance  ;
 LCD_Init();{
 delay(20);
 LCD_CMD(0x01);
-delay(4);}
+delay(4);
 UART3_Check();
 GPS_Init()
 RGBLED_Init ();
@@ -199,9 +199,6 @@ distance=DST( LATIT , LONGIT);
 sprintf(text1,"%d",distance);
 sprintf(text2,"%d",distance);
 sprintf(text3,"%d",distance);
-delay(20);
-LCD_CMD(0x01);
-delay(4);
 LCD_WR('D');
 LCD_WR('I');
 LCD_WR('S');	
