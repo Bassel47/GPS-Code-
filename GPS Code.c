@@ -18,6 +18,7 @@ return (deg * pi / 180);
 double rad2deg(double rad) {
 return (rad * 180 / pi);
 }
+int n=1;
 double DST(double lat2, double lon2) {
     double lat1; double lon1;
 double theta, dist;
@@ -25,8 +26,7 @@ if ((lat1 == lat2) && (lon1 == lon2)) {
 return 0;
 }
 else {
-    int n=1;
-    if(n==1){
+       if(n==1){
         lat1=lat2;
         lon1=lon2;
         n=n+1;
